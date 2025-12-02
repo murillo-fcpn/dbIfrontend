@@ -1,13 +1,17 @@
 <mat-toolbar>
-    <button matIconButton class="example-icon" aria-label="Example icon-button with menu icon">
+    <!-- <a matIconButton>
         <mat-icon>menu</mat-icon>
-    </button>
-    <span>My App</span>
+    </a> -->
+    <a matFab extended routerLink="/">
+        <span>My App</span>
+    </a>
     <span class="spacer"></span>
-    <button matIconButton class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
-        <mat-icon>favorite</mat-icon>
-    </button>
-    <button matIconButton class="example-icon" aria-label="Example icon-button with share icon">
-        <mat-icon>share</mat-icon>
+    <a matFab extended routerLink="/servicios">
+        <mat-icon>people</mat-icon>
+        Servicios publicos
+    </a>
+    <button matFab extended>
+        <mat-icon>local_taxi</mat-icon>
+        Movilidad urbana
     </button>
 </mat-toolbar>
