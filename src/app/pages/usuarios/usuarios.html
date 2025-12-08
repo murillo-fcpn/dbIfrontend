@@ -1,0 +1,232 @@
+<div class="usuarios-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de Usuarios</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <mat-tab-group>
+        <!-- Cuentas Tab -->
+        <mat-tab label="Cuentas">
+          <div class="tab-content">
+            <table mat-table [dataSource]="usersSrv.cuentas()" class="data-table">
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let cuenta">{{ cuenta.id }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="usuario">
+                <th mat-header-cell *matHeaderCellDef>Usuario</th>
+                <td mat-cell *matCellDef="let cuenta">{{ cuenta.usuario }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
+                <td mat-cell *matCellDef="let cuenta">{{ cuenta.email }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="rol_id">
+                <th mat-header-cell *matHeaderCellDef>Rol ID</th>
+                <td mat-cell *matCellDef="let cuenta">{{ cuenta.rol_id }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let cuenta">{{ cuenta.estado }}</td>
+              </ng-container>
+              
+              <tr mat-header-row *matHeaderRowDef="cuentasColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: cuentasColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Ciudadanos Tab -->
+        <mat-tab label="Ciudadanos">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddCiudadanoForm()">
+                <mat-icon>{{ showAddCiudadanoForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddCiudadanoForm ? 'Cancelar' : 'Agregar Ciudadano' }}
+              </button>
+            </div>
+
+            @if (showAddCiudadanoForm) {
+              <div class="add-form">
+                <h3>Nuevo Ciudadano</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Nombre</mat-label>
+                    <input matInput [(ngModel)]="newCiudadano.nombre" required>
+                  </mat-form-field>
+                  
+                  <mat-form-field>
+                    <mat-label>Apellido</mat-label>
+                    <input matInput [(ngModel)]="newCiudadano.apellido" required>
+                  </mat-form-field>
+                  
+                  <mat-form-field>
+                    <mat-label>CI</mat-label>
+                    <input matInput [(ngModel)]="newCiudadano.ci" required>
+                  </mat-form-field>
+                  
+                  <mat-form-field>
+                    <mat-label>Teléfono</mat-label>
+                    <input matInput [(ngModel)]="newCiudadano.telefono">
+                  </mat-form-field>
+                  
+                  <mat-form-field>
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" [(ngModel)]="newCiudadano.email">
+                  </mat-form-field>
+                  
+                  <mat-form-field>
+                    <mat-label>Dirección</mat-label>
+                    <input matInput [(ngModel)]="newCiudadano.direccion">
+                  </mat-form-field>
+                </div>
+                
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addCiudadano()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="usersSrv.ciudadanos()" class="data-table">
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let ciudadano">{{ ciudadano.id }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let ciudadano">{{ ciudadano.nombre }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="apellido">
+                <th mat-header-cell *matHeaderCellDef>Apellido</th>
+                <td mat-cell *matCellDef="let ciudadano">{{ ciudadano.apellido }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="ci">
+                <th mat-header-cell *matHeaderCellDef>CI</th>
+                <td mat-cell *matCellDef="let ciudadano">{{ ciudadano.ci }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="telefono">
+                <th mat-header-cell *matHeaderCellDef>Teléfono</th>
+                <td mat-cell *matCellDef="let ciudadano">{{ ciudadano.telefono }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
+                <td mat-cell *matCellDef="let ciudadano">{{ ciudadano.email }}</td>
+              </ng-container>
+              
+              <tr mat-header-row *matHeaderRowDef="ciudadanosColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: ciudadanosColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Roles Tab -->
+        <mat-tab label="Roles">
+          <div class="tab-content">
+            <table mat-table [dataSource]="usersSrv.roles()" class="data-table">
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let rol">{{ rol.id }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let rol">{{ rol.nombre }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let rol">{{ rol.descripcion }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let rol">{{ rol.estado }}</td>
+              </ng-container>
+              
+              <tr mat-header-row *matHeaderRowDef="rolesColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: rolesColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Permisos Tab -->
+        <mat-tab label="Permisos">
+          <div class="tab-content">
+            <table mat-table [dataSource]="usersSrv.permisos()" class="data-table">
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let permiso">{{ permiso.id }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let permiso">{{ permiso.nombre }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let permiso">{{ permiso.descripcion }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let permiso">{{ permiso.estado }}</td>
+              </ng-container>
+              
+              <tr mat-header-row *matHeaderRowDef="permisosColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: permisosColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Notificaciones Tab -->
+        <mat-tab label="Notificaciones">
+          <div class="tab-content">
+            <table mat-table [dataSource]="usersSrv.notificaciones()" class="data-table">
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let notif">{{ notif.id }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="titulo">
+                <th mat-header-cell *matHeaderCellDef>Título</th>
+                <td mat-cell *matCellDef="let notif">{{ notif.titulo }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="tipo">
+                <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                <td mat-cell *matCellDef="let notif">{{ notif.tipo }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="fecha_hora">
+                <th mat-header-cell *matHeaderCellDef>Fecha/Hora</th>
+                <td mat-cell *matCellDef="let notif">{{ notif.fecha_hora }}</td>
+              </ng-container>
+              
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let notif">{{ notif.estado }}</td>
+              </ng-container>
+              
+              <tr mat-header-row *matHeaderRowDef="notificacionesColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: notificacionesColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>
