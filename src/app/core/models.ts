@@ -197,3 +197,42 @@ export interface AgenteSeguridad {
   telefono: string;
   estado: string;
 }
+
+// ==================== MEDIO AMBIENTE ====================
+
+export interface Sensor {
+  id_sensor: number;
+  codigo: string;
+  tipo: string; // ruido, aire, temperatura, humedad
+  ubicacion: string;
+  latitud: number;
+  longitud: number;
+  fecha_instalacion: string;
+  estado: string;
+}
+
+export interface LecturaSensor {
+  id_lectura_sensor: number;
+  valor: number;
+  unidad_medida: string;
+  fecha: string;
+  hora: string;
+  tipo_lectura: string;
+}
+
+export interface AlertaAmbiental {
+  id_alerta: number;
+  fecha: string;
+  hora: string;
+  tipo_alerta: string;
+  descripcion: string;
+  estado: string;
+}
+
+export interface Zona {
+  id_zona: number;
+  nombre: string;
+  poligono_geojson: string;
+  descripcion: string;
+  tipo: string; // residencial, industrial, verde
+}

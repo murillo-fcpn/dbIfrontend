@@ -1,1 +1,422 @@
-<p>medio-ambiente works!</p>
+<div class="medio-ambiente-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de Medio Ambiente</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-tab-group>
+        <!-- Sensores Tab -->
+        <mat-tab label="Sensores Ambientales">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddSensorForm()">
+                <mat-icon>{{ showAddSensorForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddSensorForm ? 'Cancelar' : 'Agregar Sensor' }}
+              </button>
+            </div>
+
+            @if (showAddSensorForm) {
+              <div class="add-form">
+                <h3>Nuevo Sensor Ambiental</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Código</mat-label>
+                    <input matInput [(ngModel)]="newSensor.codigo" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Tipo</mat-label>
+                    <mat-select [(ngModel)]="newSensor.tipo" required>
+                      @for(tipo of tiposSensor; track tipo) {
+                        <mat-option [value]="tipo">{{ tipo | titlecase }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Ubicación</mat-label>
+                    <input matInput [(ngModel)]="newSensor.ubicacion">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Latitud</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newSensor.latitud">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Longitud</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newSensor.longitud">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Fecha de Instalación</mat-label>
+                    <input matInput type="date" [(ngModel)]="newSensor.fecha_instalacion">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newSensor.estado">
+                      <mat-option value="activo">Activo</mat-option>
+                      <mat-option value="inactivo">Inactivo</mat-option>
+                      <mat-option value="mantenimiento">Mantenimiento</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addSensor()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="medioAmbienteSrv.sensores()" class="data-table">
+              <ng-container matColumnDef="id_sensor">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let sensor">{{ sensor.id_sensor }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="codigo">
+                <th mat-header-cell *matHeaderCellDef>Código</th>
+                <td mat-cell *matCellDef="let sensor">{{ sensor.codigo }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="tipo">
+                <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                <td mat-cell *matCellDef="let sensor">
+                  <span [class]="'type-badge type-' + sensor.tipo">{{ sensor.tipo | titlecase }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="ubicacion">
+                <th mat-header-cell *matHeaderCellDef>Ubicación</th>
+                <td mat-cell *matCellDef="let sensor">{{ sensor.ubicacion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="fecha_instalacion">
+                <th mat-header-cell *matHeaderCellDef>Fecha Instalación</th>
+                <td mat-cell *matCellDef="let sensor">{{ sensor.fecha_instalacion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let sensor">
+                  <span [class]="'status-badge status-' + sensor.estado">{{ sensor.estado }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let sensor">
+                  <button mat-icon-button color="warn" (click)="deleteSensor(sensor.id_sensor)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="sensoresColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: sensoresColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Lecturas Tab -->
+        <mat-tab label="Lecturas de Sensores">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddLecturaForm()">
+                <mat-icon>{{ showAddLecturaForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddLecturaForm ? 'Cancelar' : 'Registrar Lectura' }}
+              </button>
+            </div>
+
+            @if (showAddLecturaForm) {
+              <div class="add-form">
+                <h3>Nueva Lectura de Sensor</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Valor</mat-label>
+                    <input matInput type="number" step="0.01" [(ngModel)]="newLectura.valor" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Unidad de Medida</mat-label>
+                    <input matInput [(ngModel)]="newLectura.unidad_medida" placeholder="°C, dB, ppm, %">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Fecha</mat-label>
+                    <input matInput type="date" [(ngModel)]="newLectura.fecha" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Hora</mat-label>
+                    <input matInput type="time" [(ngModel)]="newLectura.hora" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Tipo de Lectura</mat-label>
+                    <mat-select [(ngModel)]="newLectura.tipo_lectura">
+                      @for(tipo of tiposLectura; track tipo) {
+                        <mat-option [value]="tipo">{{ tipo | titlecase }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addLectura()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="medioAmbienteSrv.lecturasSensor()" class="data-table">
+              <ng-container matColumnDef="id_lectura_sensor">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let lectura">{{ lectura.id_lectura_sensor }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                <td mat-cell *matCellDef="let lectura">{{ lectura.fecha }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="hora">
+                <th mat-header-cell *matHeaderCellDef>Hora</th>
+                <td mat-cell *matCellDef="let lectura">{{ lectura.hora }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="tipo_lectura">
+                <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                <td mat-cell *matCellDef="let lectura">{{ lectura.tipo_lectura | titlecase }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="valor">
+                <th mat-header-cell *matHeaderCellDef>Valor</th>
+                <td mat-cell *matCellDef="let lectura">
+                  <strong>{{ lectura.valor }}</strong> {{ lectura.unidad_medida }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="unidad_medida">
+                <th mat-header-cell *matHeaderCellDef>Unidad</th>
+                <td mat-cell *matCellDef="let lectura">{{ lectura.unidad_medida }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let lectura">
+                  <button mat-icon-button color="warn" (click)="deleteLectura(lectura.id_lectura_sensor)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="lecturasColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: lecturasColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Alertas Ambientales Tab -->
+        <mat-tab label="Alertas Ambientales">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddAlertaForm()">
+                <mat-icon>{{ showAddAlertaForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddAlertaForm ? 'Cancelar' : 'Nueva Alerta' }}
+              </button>
+            </div>
+
+            @if (showAddAlertaForm) {
+              <div class="add-form">
+                <h3>Nueva Alerta Ambiental</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Tipo de Alerta</mat-label>
+                    <mat-select [(ngModel)]="newAlerta.tipo_alerta" required>
+                      @for(tipo of tiposAlerta; track tipo) {
+                        <mat-option [value]="tipo">{{ tipo | titlecase }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Descripción</mat-label>
+                    <textarea matInput [(ngModel)]="newAlerta.descripcion" rows="3" required></textarea>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Fecha</mat-label>
+                    <input matInput type="date" [(ngModel)]="newAlerta.fecha" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Hora</mat-label>
+                    <input matInput type="time" [(ngModel)]="newAlerta.hora" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newAlerta.estado">
+                      <mat-option value="activa">Activa</mat-option>
+                      <mat-option value="resuelta">Resuelta</mat-option>
+                      <mat-option value="cerrada">Cerrada</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addAlerta()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="medioAmbienteSrv.alertasAmbientales()" class="data-table">
+              <ng-container matColumnDef="id_alerta">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let alerta">{{ alerta.id_alerta }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                <td mat-cell *matCellDef="let alerta">{{ alerta.fecha }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="hora">
+                <th mat-header-cell *matHeaderCellDef>Hora</th>
+                <td mat-cell *matCellDef="let alerta">{{ alerta.hora }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="tipo_alerta">
+                <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                <td mat-cell *matCellDef="let alerta">
+                  <span [class]="'alert-badge alert-' + alerta.tipo_alerta">{{ alerta.tipo_alerta | titlecase }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let alerta">{{ alerta.descripcion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let alerta">
+                  <span [class]="'status-badge status-' + alerta.estado">{{ alerta.estado }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let alerta">
+                  <button mat-icon-button color="warn" (click)="deleteAlerta(alerta.id_alerta)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="alertasColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: alertasColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Zonas Tab -->
+        <mat-tab label="Zonas">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddZonaForm()">
+                <mat-icon>{{ showAddZonaForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddZonaForm ? 'Cancelar' : 'Agregar Zona' }}
+              </button>
+            </div>
+
+            @if (showAddZonaForm) {
+              <div class="add-form">
+                <h3>Nueva Zona</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Nombre</mat-label>
+                    <input matInput [(ngModel)]="newZona.nombre" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Tipo</mat-label>
+                    <mat-select [(ngModel)]="newZona.tipo" required>
+                      @for(tipo of tiposZona; track tipo) {
+                        <mat-option [value]="tipo">{{ tipo | titlecase }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Descripción</mat-label>
+                    <textarea matInput [(ngModel)]="newZona.descripcion" rows="3"></textarea>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Polígono GeoJSON</mat-label>
+                    <textarea matInput [(ngModel)]="newZona.poligono_geojson" rows="4" placeholder='{"type":"Polygon","coordinates":[...]}'></textarea>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addZona()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="medioAmbienteSrv.zonas()" class="data-table">
+              <ng-container matColumnDef="id_zona">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let zona">{{ zona.id_zona }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let zona">{{ zona.nombre }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="tipo">
+                <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                <td mat-cell *matCellDef="let zona">
+                  <span [class]="'zone-badge zone-' + zona.tipo">{{ zona.tipo | titlecase }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let zona">{{ zona.descripcion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let zona">
+                  <button mat-icon-button color="warn" (click)="deleteZona(zona.id_zona)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="zonasColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: zonasColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>
