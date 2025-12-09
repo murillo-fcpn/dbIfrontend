@@ -1,1 +1,486 @@
-<p>movilidad works!</p>
+<div class="movilidad-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de Movilidad Urbana</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-tab-group>
+        <!-- Tipos de Transporte Tab -->
+        <mat-tab label="Tipos de Transporte">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddTipoTransporteForm()">
+                <mat-icon>{{ showAddTipoTransporteForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddTipoTransporteForm ? 'Cancelar' : 'Agregar Tipo' }}
+              </button>
+            </div>
+
+            @if (showAddTipoTransporteForm) {
+              <div class="add-form">
+                <h3>Nuevo Tipo de Transporte</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Nombre</mat-label>
+                    <input matInput [(ngModel)]="newTipoTransporte.nombre" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Descripción</mat-label>
+                    <textarea matInput [(ngModel)]="newTipoTransporte.descripcion" rows="3"></textarea>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addTipoTransporte()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="movilidadSrv.tiposTransporte()" class="data-table">
+              <ng-container matColumnDef="id_tipo_transporte">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let tipo">{{ tipo.id_tipo_transporte }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let tipo">{{ tipo.nombre }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let tipo">{{ tipo.descripcion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let tipo">
+                  <button mat-icon-button color="warn" (click)="deleteTipoTransporte(tipo.id_tipo_transporte)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="tiposTransporteColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: tiposTransporteColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Tipos de Incidente Tab -->
+        <mat-tab label="Tipos de Incidente">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddTipoIncidenteForm()">
+                <mat-icon>{{ showAddTipoIncidenteForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddTipoIncidenteForm ? 'Cancelar' : 'Agregar Tipo' }}
+              </button>
+            </div>
+
+            @if (showAddTipoIncidenteForm) {
+              <div class="add-form">
+                <h3>Nuevo Tipo de Incidente</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Nombre</mat-label>
+                    <input matInput [(ngModel)]="newTipoIncidente.nombre" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Categoría</mat-label>
+                    <mat-select [(ngModel)]="newTipoIncidente.categoria" required>
+                      @for(cat of categoriasIncidente; track cat) {
+                        <mat-option [value]="cat">{{ cat | titlecase }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Descripción</mat-label>
+                    <textarea matInput [(ngModel)]="newTipoIncidente.descripcion" rows="3"></textarea>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addTipoIncidente()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="movilidadSrv.tiposIncidente()" class="data-table">
+              <ng-container matColumnDef="id_tipo_incidente">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let tipo">{{ tipo.id_tipo_incidente }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let tipo">{{ tipo.nombre }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let tipo">{{ tipo.descripcion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="categoria">
+                <th mat-header-cell *matHeaderCellDef>Categoría</th>
+                <td mat-cell *matCellDef="let tipo">
+                  <span [class]="'category-badge category-' + tipo.categoria">{{ tipo.categoria | titlecase }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let tipo">
+                  <button mat-icon-button color="warn" (click)="deleteTipoIncidente(tipo.id_tipo_incidente)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="tiposIncidenteColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: tiposIncidenteColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Vehículos Tab -->
+        <mat-tab label="Vehículos">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddVehiculoForm()">
+                <mat-icon>{{ showAddVehiculoForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddVehiculoForm ? 'Cancelar' : 'Agregar Vehículo' }}
+              </button>
+            </div>
+
+            @if (showAddVehiculoForm) {
+              <div class="add-form">
+                <h3>Nuevo Vehículo</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Placa</mat-label>
+                    <input matInput [(ngModel)]="newVehiculo.placa" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Modelo</mat-label>
+                    <input matInput [(ngModel)]="newVehiculo.modelo" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Año de Fabricación</mat-label>
+                    <input matInput type="number" [(ngModel)]="newVehiculo.anio_fabricacion">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Capacidad Máxima</mat-label>
+                    <input matInput type="number" [(ngModel)]="newVehiculo.capacidad_max">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Fecha de Alta</mat-label>
+                    <input matInput type="date" [(ngModel)]="newVehiculo.fecha_alta">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newVehiculo.estado">
+                      <mat-option value="activo">Activo</mat-option>
+                      <mat-option value="inactivo">Inactivo</mat-option>
+                      <mat-option value="mantenimiento">Mantenimiento</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addVehiculo()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="movilidadSrv.vehiculos()" class="data-table">
+              <ng-container matColumnDef="id_vehiculo">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let vehiculo">{{ vehiculo.id_vehiculo }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="placa">
+                <th mat-header-cell *matHeaderCellDef>Placa</th>
+                <td mat-cell *matCellDef="let vehiculo">{{ vehiculo.placa }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="modelo">
+                <th mat-header-cell *matHeaderCellDef>Modelo</th>
+                <td mat-cell *matCellDef="let vehiculo">{{ vehiculo.modelo }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="anio_fabricacion">
+                <th mat-header-cell *matHeaderCellDef>Año</th>
+                <td mat-cell *matCellDef="let vehiculo">{{ vehiculo.anio_fabricacion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="capacidad_max">
+                <th mat-header-cell *matHeaderCellDef>Capacidad</th>
+                <td mat-cell *matCellDef="let vehiculo">{{ vehiculo.capacidad_max }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let vehiculo">
+                  <span [class]="'status-badge status-' + vehiculo.estado">{{ vehiculo.estado }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let vehiculo">
+                  <button mat-icon-button color="warn" (click)="deleteVehiculo(vehiculo.id_vehiculo)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="vehiculosColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: vehiculosColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Conductores Tab -->
+        <mat-tab label="Conductores">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddConductorForm()">
+                <mat-icon>{{ showAddConductorForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddConductorForm ? 'Cancelar' : 'Agregar Conductor' }}
+              </button>
+            </div>
+
+            @if (showAddConductorForm) {
+              <div class="add-form">
+                <h3>Nuevo Conductor</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Nombre</mat-label>
+                    <input matInput [(ngModel)]="newConductor.nombre" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Apellido</mat-label>
+                    <input matInput [(ngModel)]="newConductor.apellido" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>CI</mat-label>
+                    <input matInput [(ngModel)]="newConductor.ci" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Teléfono</mat-label>
+                    <input matInput [(ngModel)]="newConductor.telefono">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" [(ngModel)]="newConductor.email">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Licencia</mat-label>
+                    <input matInput [(ngModel)]="newConductor.licencia">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Vencimiento Certificado</mat-label>
+                    <input matInput type="date" [(ngModel)]="newConductor.fecha_vencimiento_certificado">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newConductor.estado">
+                      <mat-option value="activo">Activo</mat-option>
+                      <mat-option value="inactivo">Inactivo</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addConductor()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="movilidadSrv.conductores()" class="data-table">
+              <ng-container matColumnDef="id_conductor">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let conductor">{{ conductor.id_conductor }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let conductor">{{ conductor.nombre }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="apellido">
+                <th mat-header-cell *matHeaderCellDef>Apellido</th>
+                <td mat-cell *matCellDef="let conductor">{{ conductor.apellido }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="ci">
+                <th mat-header-cell *matHeaderCellDef>CI</th>
+                <td mat-cell *matCellDef="let conductor">{{ conductor.ci }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="licencia">
+                <th mat-header-cell *matHeaderCellDef>Licencia</th>
+                <td mat-cell *matCellDef="let conductor">{{ conductor.licencia }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="telefono">
+                <th mat-header-cell *matHeaderCellDef>Teléfono</th>
+                <td mat-cell *matCellDef="let conductor">{{ conductor.telefono }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let conductor">
+                  <span [class]="'status-badge status-' + conductor.estado">{{ conductor.estado }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let conductor">
+                  <button mat-icon-button color="warn" (click)="deleteConductor(conductor.id_conductor)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="conductoresColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: conductoresColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Rutas Tab -->
+        <mat-tab label="Rutas">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddRutaForm()">
+                <mat-icon>{{ showAddRutaForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddRutaForm ? 'Cancelar' : 'Agregar Ruta' }}
+              </button>
+            </div>
+
+            @if (showAddRutaForm) {
+              <div class="add-form">
+                <h3>Nueva Ruta</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Nombre</mat-label>
+                    <input matInput [(ngModel)]="newRuta.nombre" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Distancia (km)</mat-label>
+                    <input matInput type="number" [(ngModel)]="newRuta.distancia_km">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Tiempo Estimado (min)</mat-label>
+                    <input matInput type="number" [(ngModel)]="newRuta.tiempo_estimado_min">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Color en Mapa</mat-label>
+                    <input matInput type="color" [(ngModel)]="newRuta.color_mapa">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newRuta.estado">
+                      <mat-option value="activo">Activo</mat-option>
+                      <mat-option value="inactivo">Inactivo</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addRuta()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="movilidadSrv.rutas()" class="data-table">
+              <ng-container matColumnDef="id_ruta">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let ruta">{{ ruta.id_ruta }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let ruta">{{ ruta.nombre }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="distancia_km">
+                <th mat-header-cell *matHeaderCellDef>Distancia (km)</th>
+                <td mat-cell *matCellDef="let ruta">{{ ruta.distancia_km }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="tiempo_estimado_min">
+                <th mat-header-cell *matHeaderCellDef>Tiempo (min)</th>
+                <td mat-cell *matCellDef="let ruta">{{ ruta.tiempo_estimado_min }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="color_mapa">
+                <th mat-header-cell *matHeaderCellDef>Color</th>
+                <td mat-cell *matCellDef="let ruta">
+                  <span class="color-indicator" [style.background-color]="ruta.color_mapa"></span>
+                  {{ ruta.color_mapa }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let ruta">
+                  <span [class]="'status-badge status-' + ruta.estado">{{ ruta.estado }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let ruta">
+                  <button mat-icon-button color="warn" (click)="deleteRuta(ruta.id_ruta)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="rutasColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: rutasColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>
