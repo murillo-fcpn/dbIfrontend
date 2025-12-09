@@ -85,6 +85,24 @@
                     <input matInput [(ngModel)]="newCiudadano.direccion">
                   </mat-form-field>
                 </div>
+
+                <div class="map-section">
+                  <h4>Ubicación en el Mapa</h4>
+                  <p class="map-instructions">Haz clic en el mapa para seleccionar la ubicación del ciudadano</p>
+                  <div #mapContainer class="map-container"></div>
+                  
+                  <div class="coordinates-display">
+                    <mat-form-field>
+                      <mat-label>Latitud</mat-label>
+                      <input matInput [(ngModel)]="newCiudadano.latitud" readonly>
+                    </mat-form-field>
+                    
+                    <mat-form-field>
+                      <mat-label>Longitud</mat-label>
+                      <input matInput [(ngModel)]="newCiudadano.longitud" readonly>
+                    </mat-form-field>
+                  </div>
+                </div>
                 
                 <div class="form-actions">
                   <button mat-raised-button color="primary" (click)="addCiudadano()">

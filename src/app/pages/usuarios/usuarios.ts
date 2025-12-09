@@ -1,6 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import * as L from 'leaflet';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,8 +28,12 @@ import { Ciudadano } from '../../core/interfaces';
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.scss',
 })
-export class Usuarios implements OnInit {
+export class Usuarios implements OnInit, AfterViewInit {
   usersSrv = inject(UsersSrv);
+  
+  @ViewChild('mapContainer') mapContainer!: ElementRef;
+  private map?: L.Map;
+  private marker?: L.Marker;
   
   // Display columns for tables
   cuentasColumns = ['id', 'usuario', 'email', 'rol_id', 'estado'];
@@ -45,11 +50,17 @@ export class Usuarios implements OnInit {
     ci: '',
     telefono: '',
     email: '',
-    direccion: ''
+    direccion: '',
+    latitud: undefined,
+    longitud: undefined
   };
 
   ngOnInit() {
     this.loadAllData();
+  }
+
+  ngAfterViewInit() {
+    // Initialize map when form is shown
   }
 
   loadAllData() {
@@ -64,6 +75,13 @@ export class Usuarios implements OnInit {
     this.showAddCiudadanoForm = !this.showAddCiudadanoForm;
     if (!this.showAddCiudadanoForm) {
       this.resetCiudadanoForm();
+      if (this.map) {
+        this.map.remove();
+        this.map = undefined;
+      }
+    } else {
+      // Initialize map after view is updated
+      setTimeout(() => this.initMap(), 100);
     }
   }
 
@@ -87,7 +105,68 @@ export class Usuarios implements OnInit {
       ci: '',
       telefono: '',
       email: '',
-      direccion: ''
+      direccion: '',
+      latitud: undefined,
+      longitud: undefined
     };
+    if (this.marker) {
+      this.marker.remove();
+      this.marker = undefined;
+    }
+  }
+
+  private initMap() {
+    if (!this.mapContainer) return;
+
+    // Default center: La Paz, Bolivia
+    const defaultLat = -16.5000;
+    const defaultLng = -68.1500;
+
+    this.map = L.map(this.mapContainer.nativeElement).setView([defaultLat, defaultLng], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(this.map);
+
+    // Add click event to map
+    this.map.on('click', (e: L.LeafletMouseEvent) => {
+      this.onMapClick(e);
+    });
+
+    // Fix for marker icon issue in Leaflet with Angular
+    const iconRetinaUrl = 'assets/marker-icon-2x.png';
+    const iconUrl = 'assets/marker-icon.png';
+    const shadowUrl = 'assets/marker-shadow.png';
+    const iconDefault = L.icon({
+      iconRetinaUrl,
+      iconUrl,
+      shadowUrl,
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      tooltipAnchor: [16, -28],
+      shadowSize: [41, 41]
+    });
+    L.Marker.prototype.options.icon = iconDefault;
+  }
+
+  private onMapClick(e: L.LeafletMouseEvent) {
+    const { lat, lng } = e.latlng;
+    
+    // Update form values
+    this.newCiudadano.latitud = lat;
+    this.newCiudadano.longitud = lng;
+
+    // Remove existing marker if any
+    if (this.marker) {
+      this.marker.remove();
+    }
+
+    // Add new marker
+    if (this.map) {
+      this.marker = L.marker([lat, lng]).addTo(this.map);
+      this.marker.bindPopup(`Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`).openPopup();
+    }
   }
 }

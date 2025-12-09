@@ -53,3 +53,12 @@ export interface Reclamo {
   fecha_creacion: string;
   imagen_url: string;
 }
+
+export interface CorteProgramado {
+  id_corte: number;
+  fecha_inicio: string;
+  fecha_fin: string;
+  motivo: string;
+  zonas_afectadas: string;
+  estado: string;
+}
