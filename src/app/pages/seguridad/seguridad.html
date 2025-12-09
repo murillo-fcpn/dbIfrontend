@@ -1,1 +1,559 @@
-<p>seguridad works!</p>
+<div class="seguridad-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestión de Seguridad Ciudadana</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-tab-group>
+        <!-- Patrullajes Tab -->
+        <mat-tab label="Patrullajes">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddPatrullajeForm()">
+                <mat-icon>{{ showAddPatrullajeForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddPatrullajeForm ? 'Cancelar' : 'Agregar Patrullaje' }}
+              </button>
+            </div>
+
+            @if (showAddPatrullajeForm) {
+              <div class="add-form">
+                <h3>Nuevo Patrullaje</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Fecha</mat-label>
+                    <input matInput type="date" [(ngModel)]="newPatrullaje.fecha" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Hora Inicio</mat-label>
+                    <input matInput type="time" [(ngModel)]="newPatrullaje.hora_inicio" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Hora Fin</mat-label>
+                    <input matInput type="time" [(ngModel)]="newPatrullaje.hora_fin">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Zona</mat-label>
+                    <input matInput [(ngModel)]="newPatrullaje.zona" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Dirección</mat-label>
+                    <input matInput [(ngModel)]="newPatrullaje.direccion">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Latitud Inicio</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newPatrullaje.latitud_inicio">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Longitud Inicio</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newPatrullaje.longitud_inicio">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Latitud Fin</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newPatrullaje.latitud_fin">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Longitud Fin</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newPatrullaje.longitud_fin">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newPatrullaje.estado">
+                      <mat-option value="activo">Activo</mat-option>
+                      <mat-option value="completado">Completado</mat-option>
+                      <mat-option value="cancelado">Cancelado</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addPatrullaje()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="seguridadSrv.patrullajes()" class="data-table">
+              <ng-container matColumnDef="id_patrullaje">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let patrullaje">{{ patrullaje.id_patrullaje }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                <td mat-cell *matCellDef="let patrullaje">{{ patrullaje.fecha }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="zona">
+                <th mat-header-cell *matHeaderCellDef>Zona</th>
+                <td mat-cell *matCellDef="let patrullaje">{{ patrullaje.zona }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="hora_inicio">
+                <th mat-header-cell *matHeaderCellDef>Hora Inicio</th>
+                <td mat-cell *matCellDef="let patrullaje">{{ patrullaje.hora_inicio }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="hora_fin">
+                <th mat-header-cell *matHeaderCellDef>Hora Fin</th>
+                <td mat-cell *matCellDef="let patrullaje">{{ patrullaje.hora_fin }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="direccion">
+                <th mat-header-cell *matHeaderCellDef>Dirección</th>
+                <td mat-cell *matCellDef="let patrullaje">{{ patrullaje.direccion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let patrullaje">
+                  <span [class]="'status-badge status-' + patrullaje.estado">{{ patrullaje.estado }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let patrullaje">
+                  <button mat-icon-button color="warn" (click)="deletePatrullaje(patrullaje.id_patrullaje)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="patrullajesColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: patrullajesColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Cámaras Tab -->
+        <mat-tab label="Cámaras de Seguridad">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddCamaraForm()">
+                <mat-icon>{{ showAddCamaraForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddCamaraForm ? 'Cancelar' : 'Agregar Cámara' }}
+              </button>
+            </div>
+
+            @if (showAddCamaraForm) {
+              <div class="add-form">
+                <h3>Nueva Cámara de Seguridad</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Dirección</mat-label>
+                    <input matInput [(ngModel)]="newCamara.direccion" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Latitud</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newCamara.latitud">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Longitud</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newCamara.longitud">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Resolución</mat-label>
+                    <mat-select [(ngModel)]="newCamara.resolucion">
+                      @for(res of resolucionesCamara; track res) {
+                        <mat-option [value]="res">{{ res }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Fecha de Instalación</mat-label>
+                    <input matInput type="date" [(ngModel)]="newCamara.fecha_instalacion">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newCamara.estado">
+                      <mat-option value="activo">Activo</mat-option>
+                      <mat-option value="inactivo">Inactivo</mat-option>
+                      <mat-option value="mantenimiento">Mantenimiento</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addCamara()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="seguridadSrv.camaras()" class="data-table">
+              <ng-container matColumnDef="id_camara">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let camara">{{ camara.id_camara }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="direccion">
+                <th mat-header-cell *matHeaderCellDef>Dirección</th>
+                <td mat-cell *matCellDef="let camara">{{ camara.direccion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="resolucion">
+                <th mat-header-cell *matHeaderCellDef>Resolución</th>
+                <td mat-cell *matCellDef="let camara">{{ camara.resolucion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="fecha_instalacion">
+                <th mat-header-cell *matHeaderCellDef>Fecha Instalación</th>
+                <td mat-cell *matCellDef="let camara">{{ camara.fecha_instalacion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let camara">
+                  <span [class]="'status-badge status-' + camara.estado">{{ camara.estado }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let camara">
+                  <button mat-icon-button color="warn" (click)="deleteCamara(camara.id_camara)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="camarasColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: camarasColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Incidentes de Seguridad Tab -->
+        <mat-tab label="Incidentes">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddIncidenteForm()">
+                <mat-icon>{{ showAddIncidenteForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddIncidenteForm ? 'Cancelar' : 'Reportar Incidente' }}
+              </button>
+            </div>
+
+            @if (showAddIncidenteForm) {
+              <div class="add-form">
+                <h3>Nuevo Incidente de Seguridad</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Descripción</mat-label>
+                    <textarea matInput [(ngModel)]="newIncidente.descripcion" rows="3" required></textarea>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Fecha</mat-label>
+                    <input matInput type="date" [(ngModel)]="newIncidente.fecha" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Hora</mat-label>
+                    <input matInput type="time" [(ngModel)]="newIncidente.hora" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Latitud</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newIncidente.latitud">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Longitud</mat-label>
+                    <input matInput type="number" step="0.000001" [(ngModel)]="newIncidente.longitud">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newIncidente.estado">
+                      @for(estado of estadosIncidente; track estado) {
+                        <mat-option [value]="estado">{{ estado | titlecase }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addIncidente()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="seguridadSrv.incidentesSeguridad()" class="data-table">
+              <ng-container matColumnDef="id_incidente_seg">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let incidente">{{ incidente.id_incidente_seg }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                <td mat-cell *matCellDef="let incidente">{{ incidente.fecha }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="hora">
+                <th mat-header-cell *matHeaderCellDef>Hora</th>
+                <td mat-cell *matCellDef="let incidente">{{ incidente.hora }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let incidente">{{ incidente.descripcion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let incidente">
+                  <span [class]="'status-badge status-' + incidente.estado">{{ incidente.estado | titlecase }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let incidente">
+                  <button mat-icon-button color="warn" (click)="deleteIncidente(incidente.id_incidente_seg)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="incidentesColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: incidentesColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Denuncias Tab -->
+        <mat-tab label="Denuncias">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddDenunciaForm()">
+                <mat-icon>{{ showAddDenunciaForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddDenunciaForm ? 'Cancelar' : 'Nueva Denuncia' }}
+              </button>
+            </div>
+
+            @if (showAddDenunciaForm) {
+              <div class="add-form">
+                <h3>Nueva Denuncia</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Descripción</mat-label>
+                    <textarea matInput [(ngModel)]="newDenuncia.descripcion" rows="4" required></textarea>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Hora</mat-label>
+                    <input matInput type="time" [(ngModel)]="newDenuncia.hora">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>URL de Evidencia</mat-label>
+                    <input matInput [(ngModel)]="newDenuncia.evidencia_url" placeholder="https://...">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newDenuncia.estado">
+                      @for(estado of estadosDenuncia; track estado) {
+                        <mat-option [value]="estado">{{ estado | titlecase }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addDenuncia()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="seguridadSrv.denuncias()" class="data-table">
+              <ng-container matColumnDef="id_denuncia">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let denuncia">{{ denuncia.id_denuncia }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="hora">
+                <th mat-header-cell *matHeaderCellDef>Hora</th>
+                <td mat-cell *matCellDef="let denuncia">{{ denuncia.hora }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let denuncia">{{ denuncia.descripcion }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="evidencia_url">
+                <th mat-header-cell *matHeaderCellDef>Evidencia</th>
+                <td mat-cell *matCellDef="let denuncia">
+                  @if (denuncia.evidencia_url) {
+                    <a [href]="denuncia.evidencia_url" target="_blank" mat-button color="primary">
+                      <mat-icon>link</mat-icon>
+                      Ver
+                    </a>
+                  } @else {
+                    <span class="no-evidence">Sin evidencia</span>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let denuncia">
+                  <span [class]="'status-badge status-' + denuncia.estado">{{ denuncia.estado | titlecase }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let denuncia">
+                  <button mat-icon-button color="warn" (click)="deleteDenuncia(denuncia.id_denuncia)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="denunciasColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: denunciasColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+
+        <!-- Agentes de Seguridad Tab -->
+        <mat-tab label="Agentes">
+          <div class="tab-content">
+            <div class="actions">
+              <button mat-raised-button color="primary" (click)="toggleAddAgenteForm()">
+                <mat-icon>{{ showAddAgenteForm ? 'close' : 'add' }}</mat-icon>
+                {{ showAddAgenteForm ? 'Cancelar' : 'Agregar Agente' }}
+              </button>
+            </div>
+
+            @if (showAddAgenteForm) {
+              <div class="add-form">
+                <h3>Nuevo Agente de Seguridad</h3>
+                <div class="form-grid">
+                  <mat-form-field>
+                    <mat-label>Nombre</mat-label>
+                    <input matInput [(ngModel)]="newAgente.nombre" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Apellido</mat-label>
+                    <input matInput [(ngModel)]="newAgente.apellido" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>CI</mat-label>
+                    <input matInput [(ngModel)]="newAgente.ci" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Placa</mat-label>
+                    <input matInput [(ngModel)]="newAgente.placa" required>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Teléfono</mat-label>
+                    <input matInput [(ngModel)]="newAgente.telefono">
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <mat-label>Estado</mat-label>
+                    <mat-select [(ngModel)]="newAgente.estado">
+                      <mat-option value="activo">Activo</mat-option>
+                      <mat-option value="inactivo">Inactivo</mat-option>
+                      <mat-option value="licencia">En Licencia</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" (click)="addAgente()">
+                    <mat-icon>save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            }
+
+            <table mat-table [dataSource]="seguridadSrv.agentesSeguridad()" class="data-table">
+              <ng-container matColumnDef="id_agente">
+                <th mat-header-cell *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let agente">{{ agente.id_agente }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let agente">{{ agente.nombre }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="apellido">
+                <th mat-header-cell *matHeaderCellDef>Apellido</th>
+                <td mat-cell *matCellDef="let agente">{{ agente.apellido }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="ci">
+                <th mat-header-cell *matHeaderCellDef>CI</th>
+                <td mat-cell *matCellDef="let agente">{{ agente.ci }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="placa">
+                <th mat-header-cell *matHeaderCellDef>Placa</th>
+                <td mat-cell *matCellDef="let agente">{{ agente.placa }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="telefono">
+                <th mat-header-cell *matHeaderCellDef>Teléfono</th>
+                <td mat-cell *matCellDef="let agente">{{ agente.telefono }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let agente">
+                  <span [class]="'status-badge status-' + agente.estado">{{ agente.estado }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let agente">
+                  <button mat-icon-button color="warn" (click)="deleteAgente(agente.id_agente)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="agentesColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: agentesColumns;"></tr>
+            </table>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

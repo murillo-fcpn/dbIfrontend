@@ -143,3 +143,57 @@ export interface IncidenteTransito {
   longitud: number;
   estado: string;
 }
+
+// ==================== SEGURIDAD CIUDADANA ====================
+
+export interface Patrullaje {
+  id_patrullaje: number;
+  fecha: string;
+  hora_inicio: string;
+  hora_fin: string;
+  zona: string;
+  latitud_inicio: number;
+  longitud_inicio: number;
+  latitud_fin: number;
+  longitud_fin: number;
+  estado: string;
+  direccion: string;
+}
+
+export interface Camara {
+  id_camara: number;
+  latitud: number;
+  longitud: number;
+  direccion: string;
+  estado: string;
+  fecha_instalacion: string;
+  resolucion: string;
+}
+
+export interface IncidenteSeguridad {
+  id_incidente_seg: number;
+  descripcion: string;
+  hora: string;
+  fecha: string;
+  latitud: number;
+  longitud: number;
+  estado: string;
+}
+
+export interface Denuncia {
+  id_denuncia: number;
+  descripcion: string;
+  hora: string;
+  evidencia_url: string;
+  estado: string;
+}
+
+export interface AgenteSeguridad {
+  id_agente: number;
+  nombre: string;
+  apellido: string;
+  ci: string;
+  placa: string;
+  telefono: string;
+  estado: string;
+}
